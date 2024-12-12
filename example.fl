@@ -1,16 +1,33 @@
 # FlowLang example file
+# Start by defining shared objects
+# Functions called from a shared objects will always share a state together.
+# You may now define the same .so file twice
+$so 
+  libworker 
+  @/nctsiridis/libworker.so;
 
 # ! overides the function name
 # @ can be overwritten with $@, default is /opt/flowlang/
 # Can make package manager down the road
-$fn hello_a !greeter @/nctsiridis/worker_a.so
+# Anything that's not a space or newline will try to parse as a token 
+$fn 
+  greeter 
+  libworker.hello_a 
+  () -> (1|char*), (2|int, char*); # no inputs and can write a char* to channel 1 or char* + int channel 2
 
-$ent num1<int> num2<int>
-  [num1, num2] -> addr(0) # creates an instance of the addr function with unique id 0
-  addr(0){1:1} -> print # sends the first (and only) variable from the first channels output to the generic printer
-  addr -> hello_a
+$fn !addr adder:
+  @/nctsiridis/libworker.so,
+  (int, int) -> (1|int); # function takes two inputs and might write an integer to channel 1
 
-$flow num1<int> num2<int>
+$ent num1(int) num2(int): # ent is the entry function and is essential
+  (num1, num2) -> addr, # creates an instance of the addr function with unique id 0
+  addr(1|1) -> @print, # sends the first (and only) variable from the first channels output to the generic printer
+  addr -> greeter,
+  greeter(2|) -> greeter;
+
+$flow num1(int) num2(int):
+  (num1) -> @print # use @ to access generic functions provided by wfl interpreter 
+  
  
 # functions can define "output channels" which are based on the emit() function
 # for example emit(1, "hello") will emit the string "hello" on channel 1
