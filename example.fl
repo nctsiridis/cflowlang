@@ -1,0 +1,16 @@
+# FlowLang example file
+
+# ! overides the function name
+# @ can be overwritten with $@, default is /opt/flowlang/
+# Can make package manager down the road
+$fn hello_a !greeter @/nctsiridis/worker_a.so
+
+$ent num1<int> num2<int>
+  [num1, num2] -> addr(0) # creates an instance of the addr function with unique id 0
+  addr(0){1:1} -> print # sends the first (and only) variable from the first channels output to the generic printer
+  addr -> hello_a
+
+$flow num1<int> num2<int>
+ 
+# functions can define "output channels" which are based on the emit() function
+# for example emit(1, "hello") will emit the string "hello" on channel 1
