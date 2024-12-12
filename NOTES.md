@@ -1,4 +1,4 @@
-# Py3FlowLang Notes
+# CFlowLang Notes
 
 ## Compiling Shared Object Files
 Use flags for position independent code (PIC) and shared object.
